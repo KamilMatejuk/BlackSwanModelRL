@@ -1,6 +1,6 @@
 openapi: "3.0.0"
 info:
-  title: Model with basic RSI strategy API
+  title: Model for reinforcement learning API
   version: '0.1'
 paths:
   /init:
