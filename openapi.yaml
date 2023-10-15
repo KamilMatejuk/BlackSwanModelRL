@@ -1,14 +1,15 @@
 openapi: "3.0.0"
 info:
-  title: API
+  title: Model with basic RSI strategy API
   version: '0.1'
 paths:
-  /greeting/{name}:
-    post:
-      operationId: main.hello
+  /init:
+    get:
+      operationId: main.init
+      parameters: []
       responses:
         200:
-          description: greet a new user
+          description: correctly initialized a new model
           content:
             text/plain:
               schema:
@@ -19,12 +20,68 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/InvalidRequest"
-      parameters:
-        - name: name
-          in: path
-          required: true
-          schema:
-            type: string
+  /action:
+    post:
+      operationId: main.action
+      parameters: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                id:
+                  type: string
+                state:
+                  $ref: "#/components/schemas/State"
+      responses:
+        200:
+          description: action to take (0 wait, 1 switch - buy or sell)
+          content:
+            text/plain:
+              schema:
+                type: integer
+        401:
+          description: invalid request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/InvalidRequest"
+  /learn:
+    post:
+      operationId: main.learn
+      parameters: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                id:
+                  type: string
+                state:
+                  $ref: "#/components/schemas/State"
+                action:
+                  type: integer
+                next_state:
+                  $ref: "#/components/schemas/State"
+                reward:
+                  type: number
+                  format: float
+      responses:
+        200:
+          description: loss after backpropagation step
+          content:
+            text/plain:
+              schema:
+                type: number
+                format: float
+        401:
+          description: invalid request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/InvalidRequest"
 components:
   schemas:
     InvalidRequest:
@@ -34,3 +91,30 @@ components:
           type: string
         details:
           type: string
+    State:
+      type: object
+      properties:
+        price:
+          type: number
+          format: float
+        volume:
+          type: number
+          format: float
+        rsi:
+          type: number
+          format: float
+        macd:
+          type: number
+          format: float
+        EMA_12:
+          type: number
+          format: float
+        EMA_26:
+          type: number
+          format: float
+        value_percent_in_account:
+          type: number
+          format: float
+        value_percent_in_assets:
+          type: number
+          format: float
